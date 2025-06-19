@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { MainTable } from './pages/main-table';
+import { Kanban } from './pages/kanban';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTabsModule } from '@angular/material/tabs';
 
 @Component({
-  selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.html',
-  styleUrl: './app.scss'
+	selector: 'app-root',
+	imports: [MatTabsModule, MatIconModule, MainTable, Kanban],
+	templateUrl: './app.html',
+	styleUrl: './app.scss',
 })
-export class App {
-  protected title = 'todolistapp';
-}
+export class App {}

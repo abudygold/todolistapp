@@ -1,0 +1,168 @@
+<div class="tw-flex tw-justify-between tw-gap-2 tw-mb-4">
+	<div class="tw-flex tw-gap-4">
+		<mat-form-field appearance="outline" class="tw-w-full">
+			<input matInput (keyup)="applyFilter($event)" placeholder="Search by task name" #input />
+			<mat-icon matSuffix>search</mat-icon>
+		</mat-form-field>
+
+		<button matButton="filled" [matMenuTriggerFor]="filterBy">
+			<mat-icon>person_pin</mat-icon>
+			Person
+		</button>
+	</div>
+
+	<div class="tw-flex tw-gap-2">
+		<button matButton="filled" (click)="addTask()">
+			<mat-icon>add</mat-icon>
+			New Task
+		</button>
+	</div>
+</div>
+
+<table mat-table [dataSource]="dataSource" matSort matSortDisableClear>
+	<ng-container matColumnDef="select">
+		<th mat-header-cell *matHeaderCellDef>
+			<mat-checkbox
+				(change)="$event ? toggleAllRows() : null"
+				[checked]="selection.hasValue() && isAllSelected()"
+				[indeterminate]="selection.hasValue() && !isAllSelected()"
+				[aria-label]="checkboxLabel()"
+			>
+			</mat-checkbox>
+		</th>
+		<td mat-cell *matCellDef="let row">
+			<mat-checkbox
+				(click)="selection.toggle(row)"
+				(change)="$event ? selection.toggle(row) : null"
+				[checked]="selection.isSelected(row)"
+				[aria-label]="checkboxLabel(row)"
+			>
+			</mat-checkbox>
+		</td>
+	</ng-container>
+
+	@for (label of displayedLabels; track $index) {
+		@if (!['Select', 'Actions'].includes(label)) {
+			<ng-container [matColumnDef]="displayedColumns[$index]">
+				<th mat-header-cell mat-sort-header *matHeaderCellDef>{{ label }}</th>
+				<td
+					mat-cell
+					*matCellDef="let row"
+					[class]="getCellClass(displayedColumns[$index], row[displayedColumns[$index]])"
+				>
+					@if (['date'].includes(displayedColumns[$index])) {
+						@if (!row['isNewRow']) {
+							{{ row[displayedColumns[$index]] | date: 'dd MMM, yyyy' }}
+						} @else {
+							<mat-form-field appearance="outline" class="tw-w-full">
+								<input
+									matInput
+									[matDatepicker]="picker"
+									[placeholder]="label"
+									[(ngModel)]="row[displayedColumns[$index]]"
+								/>
+								<mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+								<mat-datepicker #picker></mat-datepicker>
+							</mat-form-field>
+						}
+					} @else if (['photo'].includes(displayedColumns[$index])) {
+						<img
+							[src]="
+								row['developer']
+									? './assets/' + row[displayedColumns[$index]]
+									: './assets/no-image.jpg'
+							"
+							alt="Photo"
+							class="tw-w-12 tw-h-12 tw-object-cover tw-rounded-full"
+						/>
+					} @else {
+						@if (!row['isNewRow']) {
+							{{ row[displayedColumns[$index]] }}
+
+							@if (['estimatedSP', 'actualSP'].includes(displayedColumns[$index])) {
+								SP
+							}
+						} @else if (['status', 'priority', 'type'].includes(displayedColumns[$index])) {
+							<mat-form-field appearance="outline" class="tw-w-full">
+								<mat-select [placeholder]="label" [(ngModel)]="row[displayedColumns[$index]]">
+									@for (item of getOptions(displayedColumns[$index]); track $index) {
+										<mat-option [value]="item">
+											{{ item }}
+										</mat-option>
+									}
+								</mat-select>
+							</mat-form-field>
+						} @else {
+							<mat-form-field appearance="outline" class="tw-w-full">
+								<input
+									matInput
+									[type]="
+										['estimatedSP', 'actualSP'].includes(displayedColumns[$index])
+											? 'number'
+											: 'text'
+									"
+									[placeholder]="label"
+									[(ngModel)]="row[displayedColumns[$index]]"
+								/>
+							</mat-form-field>
+						}
+					}
+				</td>
+			</ng-container>
+		}
+
+		@if (label === 'Actions') {
+			<ng-container matColumnDef="actions">
+				<th mat-header-cell *matHeaderCellDef>{{ label }}</th>
+				<td mat-cell *matCellDef="let row">
+					@if (!row['isNewRow']) {
+						<button mat-icon-button (click)="editTask(row)" aria-label="Edit task">
+							<mat-icon>edit</mat-icon>
+						</button>
+					}
+
+					@if (row['isNewRow']) {
+						<button
+							mat-icon-button
+							(click)="saveTask(row)"
+							[disabled]="!row['isNewRow']"
+							aria-label="Save task"
+						>
+							<mat-icon>save</mat-icon>
+						</button>
+						<button
+							mat-icon-button
+							(click)="cancelTask(row)"
+							[disabled]="!row['isNewRow']"
+							aria-label="Cancel task"
+						>
+							<mat-icon>cancel</mat-icon>
+						</button>
+					}
+				</td>
+			</ng-container>
+		}
+	}
+
+	<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+	<tr mat-row *matRowDef="let row; columns: displayedColumns" [class.new]="row['isNewRow']"></tr>
+
+	<!-- Row shown when there is no matching data. -->
+	<tr class="mat-row" *matNoDataRow>
+		<td class="mat-cell" colspan="4">No data matching the filter "{{ input.value }}"</td>
+	</tr>
+</table>
+
+<mat-menu #filterBy="matMenu">
+	<button mat-menu-item (click)="applyFilterByDeveloper()">
+		<mat-icon>person_pin</mat-icon>
+		<span>All</span>
+	</button>
+
+	@for (item of developerList; track $index) {
+		<button mat-menu-item (click)="applyFilterByDeveloper(item)">
+			<mat-icon>person_pin</mat-icon>
+			<span>{{ item }}</span>
+		</button>
+	}
+</mat-menu>

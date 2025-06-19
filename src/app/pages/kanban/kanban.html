@@ -1,0 +1,109 @@
+<div class="tw-flex tw-gap-4">
+	<div class="tw-w-full tw-rounded-2xl tw-bg-slate-500">
+		<div class="tw-p-3 tw-h-[50px] tw-bg-[#1E73EA] tw-text-white tw-font-semibold tw-rounded-t-2xl">
+			<h2>Ready to start {{ todo.length }}</h2>
+		</div>
+
+		<div
+			cdkDropList
+			#todoList="cdkDropList"
+			[cdkDropListData]="todo"
+			[cdkDropListConnectedTo]="[inProgressList, waitingForReviewList, doneList]"
+			class="tw-min-h-screen tw-bg-transparent tw-m-6"
+			(cdkDropListDropped)="drop($event)"
+		>
+			@for (item of todo; track item) {
+				<div cdkDrag>
+					<ng-container [ngTemplateOutlet]="cardUI" [ngTemplateOutletContext]="{ item }" />
+				</div>
+			}
+		</div>
+	</div>
+
+	<div class="tw-w-full tw-rounded-2xl tw-bg-slate-500">
+		<div class="tw-p-3 tw-h-[50px] tw-bg-[#F4B266] tw-text-white tw-font-semibold tw-rounded-t-2xl">
+			<h2>In Progress {{ inProgress.length }}</h2>
+		</div>
+
+		<div
+			cdkDropList
+			#inProgressList="cdkDropList"
+			[cdkDropListData]="inProgress"
+			[cdkDropListConnectedTo]="[todoList, waitingForReviewList, doneList]"
+			class="tw-min-h-screen tw-bg-transparent tw-m-6"
+			(cdkDropListDropped)="drop($event)"
+		>
+			@for (item of inProgress; track item) {
+				<div cdkDrag>
+					<ng-container [ngTemplateOutlet]="cardUI" [ngTemplateOutletContext]="{ item }" />
+				</div>
+			}
+		</div>
+	</div>
+
+	<div class="tw-w-full tw-rounded-2xl tw-bg-slate-500">
+		<div class="tw-p-3 tw-h-[50px] tw-bg-[#AEE5FA] tw-text-white tw-font-semibold tw-rounded-t-2xl">
+			<h2>Waiting For Review {{ waitingForReview.length }}</h2>
+		</div>
+
+		<div
+			cdkDropList
+			#waitingForReviewList="cdkDropList"
+			[cdkDropListData]="waitingForReview"
+			[cdkDropListConnectedTo]="[todoList, inProgressList, doneList]"
+			class="tw-min-h-screen tw-bg-transparent tw-m-6"
+			(cdkDropListDropped)="drop($event)"
+		>
+			@for (item of waitingForReview; track item) {
+				<div cdkDrag>
+					<ng-container [ngTemplateOutlet]="cardUI" [ngTemplateOutletContext]="{ item }" />
+				</div>
+			}
+		</div>
+	</div>
+
+	<div class="tw-w-full tw-rounded-2xl tw-bg-slate-500">
+		<div class="tw-p-3 tw-h-[50px] tw-bg-[#2CC88F] tw-text-white tw-font-semibold tw-rounded-t-2xl">
+			<h2>Done {{ done.length }}</h2>
+		</div>
+
+		<div
+			cdkDropList
+			#doneList="cdkDropList"
+			[cdkDropListData]="done"
+			[cdkDropListConnectedTo]="[todoList, inProgressList, waitingForReviewList]"
+			class="tw-min-h-screen tw-bg-transparent tw-m-6"
+			(cdkDropListDropped)="drop($event)"
+		>
+			@for (item of done; track item) {
+				<div cdkDrag>
+					<ng-container [ngTemplateOutlet]="cardUI" [ngTemplateOutletContext]="{ item }" />
+				</div>
+			}
+		</div>
+	</div>
+</div>
+
+<ng-template #cardUI let-item="item">
+	<div class="card tw-mb-3">
+		<div class="card-header">{{ item.task }}</div>
+		<div class="card-tags">
+			<span class="tag priority" [class]="getTagClass('priority', item.priority)">
+				{{ item.priority }}
+			</span>
+			<span class="tag">{{ item.estimatedSP }} SP</span>
+			<span class="tag type" [class]="getTagClass('type', item.type)">{{ item.type }}</span>
+		</div>
+		<div class="card-footer">
+			<img
+				[src]="item.photo ? './assets/' + item.photo : './assets/no-image.jpg'"
+				alt="avatar"
+				class="avatar"
+			/>
+			<div class="icons">
+				<mat-icon> chat_bubble_outline</mat-icon>
+				<mat-icon>show_chart </mat-icon>
+			</div>
+		</div>
+	</div>
+</ng-template>

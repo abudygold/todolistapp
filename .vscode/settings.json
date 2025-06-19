@@ -1,0 +1,12 @@
+{
+	"scss.lint.unknownAtRules": "ignore",
+	"tailwindCSS.lint.invalidConfigPath": "ignore",
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"editor.formatOnSave": true,
+	"[html]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	}
+}
